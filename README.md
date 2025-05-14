@@ -3,6 +3,11 @@
 ## Description
 Ce projet est une application web développée avec le framework Symfony 7.2. Il s'agit d'une plateforme de gestion de parcours pédagogiques permettant aux utilisateurs de suivre des étapes d'apprentissage, d'accéder à des ressources et de soumettre des rendus.
 
+> **Note :** Ce projet a été réalisé dans le cadre d'un projet scolaire pour démontrer mes compétences techniques et pratiques en développement web.
+
+Accessible via https://sitecorp.alwaysdata.net/
+> **Note :** Ce site est susceptible d'être supprimé ou remplacé par un autre projet.
+
 ## Fonctionnalités
 
 - **Gestion des utilisateurs** : Inscription, connexion, profils utilisateurs
