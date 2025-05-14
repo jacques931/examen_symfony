@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail du Message{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card mb-4 {% if message.emetteur and message.emetteur.roles is defined and 'ROLE_ADMIN' in message.emetteur.roles %}border-danger{% endif %}">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">{{ message.titre }}</h2>
+            <small class="text-muted">{{ message.dateheure|date('d/m/Y H:i') }}</small>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>De :</strong> {{ message.emetteur ? message.emetteur.prenom ~ ' ' ~ message.emetteur.nom : 'Inconnu' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>À :</strong> {{ message.destinataire ? message.destinataire.prenom ~ ' ' ~ message.destinataire.nom : 'Inconnu' }}</p>
+                </div>
+            </div>
+            
+            <div class="message-content p-3 bg-light rounded mb-4">
+                <p class="card-text">{{ message.contenu|nl2br }}</p>
+            </div>
+            
+            {% if rendus|length > 0 %}
+            <div class="rendus-section mt-4">
+                <h5>Rendus associés :</h5>
+                <div class="list-group">
+                    {% for rendu in rendus %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Rendu du {{ rendu.dateHeure|date('d/m/Y H:i') }}</h6>
+                                <div>
+                                    {% if rendu.etapes|length > 0 and rendu.etapes.first.parcours %}
+                                        <a href="{{ path('app_parcours_show', {'id': rendu.etapes.first.parcours.id}) }}" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="fas fa-map-marked-alt"></i> Voir le parcours
+                                        </a>
+                                    {% endif %}
+                                    {% if rendu.urlDocument %}
+                                        <a href="{{ path('app_rendus_download', {'id': rendu.id}) }}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-download"></i> Télécharger le document
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if rendu.etapes|length > 0 %}
+                                <div class="etapes-list">
+                                    <small class="text-muted">Étapes associées :</small>
+                                    <ul class="list-inline mb-0">
+                                        {% for etape in rendu.etapes %}
+                                            <li class="list-inline-item">
+                                                <span class="badge bg-secondary">{{ etape.descriptif }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('app_message_index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+        
+        {% if message.emetteur == app.user %}
+            <span class="text-muted">Message envoyé</span>
+        {% else %}
+            <a href="{{ path('app_message_new') }}" class="btn btn-primary">
+                <i class="fas fa-reply"></i> Répondre
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

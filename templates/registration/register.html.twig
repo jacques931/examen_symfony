@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/form.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% from 'components/_form_layout.html.twig' import form_container %}
+    {% if form_errors(registrationForm) %}
+        <div class="alert alert-danger">
+            {{ form_errors(registrationForm) }}
+        </div>
+    {% endif %}
+    {% set form_content %}
+        {{ form_start(registrationForm, {'attr': {'class': 'needs-validation registration-form'}}) }}
+            <div class="form-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.email, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Email'
+                            }
+                        }) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.plainPassword, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Mot de passe'
+                            }
+                        }) }}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.nom, {
+                            'attr': {
+                                'class': 'form-control', 
+                                'placeholder': 'Nom'
+                            }
+                        }) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.prenom, {
+                            'attr': {
+                                'class': 'form-control', 
+                                'placeholder': 'Prénom'
+                            }
+                        }) }}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        {{ form_row(registrationForm.parcours, {
+                            'attr': {
+                                'class': 'form-control'
+                            }
+                        }) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section mt-4">
+                <div class="checkbox-wrapper form-check">
+                    {{ form_widget(registrationForm.agreeTerms) }}
+                    {{ form_label(registrationForm.agreeTerms) }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">S'inscrire</button>
+
+            <div class="form-footer mt-3">
+                <a href="{{ path('app_login') }}">Déjà inscrit ? Connectez-vous</a>
+            </div>
+        {{ form_end(registrationForm) }}
+    {% endset %}
+
+    {{ form_container('Inscription', form_content) }}
+{% endblock %}

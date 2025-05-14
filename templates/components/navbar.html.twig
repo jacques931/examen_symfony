@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('app_home') }}">Parcours Pédagogiques</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}" aria-current="page" href="{{ path('app_home') }}">Accueil</a>
+                </li>
+                {% if app.user %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_parcours_list' %}active{% endif %}" href="{{ path('app_parcours_list') }}">Mes parcours</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_message_' %}active{% endif %}" href="{{ path('app_message_index') }}">Ma messagerie</a>
+                    </li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('admin') }}">Administration</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            <div class="d-flex">
+                {% if app.user %}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ app.user.prenom }} {{ app.user.nom }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#">Mon profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-light me-2">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary">Inscription</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

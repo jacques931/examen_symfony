@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail du parcours{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col">
+            <h1 class="mb-3">{{ parcours.objet }}</h1>
+            <div class="card">
+                <div class="card-body">
+                    <div class="description mb-4">
+                        {{ parcours.description|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Étapes du parcours</h2>
+            <p class="text-muted">Suivez ces étapes dans l'ordre pour compléter votre parcours.</p>
+        </div>
+    </div>
+
+    {% if etapes|length > 0 %}
+        <div class="timeline">
+            {% for etape in etapes %}
+                <div class="timeline-item card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Étape {{ etape.position }} : {{ etape.descriptif }}</h3>
+                        <span class="badge bg-primary">Étape {{ etape.position }}/{{ etapes|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="consignes mb-4">
+                            {{ etape.consignes|raw }}
+                        </div>
+                        
+                        {% if etape.ressource|length > 0 %}
+                            <div class="ressources mt-4">
+                                <h4 class="h6">Ressources disponibles</h4>
+                                <ul class="list-group">
+                                    {% for ressource in etape.ressource %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ ressource.intitule }}</strong>
+                                                <p class="mb-1 text-muted small">{{ ressource.preseentation }}</p>
+                                                <span class="badge bg-secondary me-2">{{ ressource.nature }}</span>
+                                                <span class="badge bg-info">{{ ressource.support }}</span>
+                                            </div>
+                                            <div class="btn-group">
+                                                <a href="{{ asset('uploads/ressources/' ~ ressource.urlDocument) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i> Consulter
+                                                </a>
+                                                <a href="{{ path('app_ressource_download', {'id': ressource.id}) }}" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-download me-1"></i> Télécharger
+                                                </a>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Section des rendus -->
+                        <div class="rendus mt-4">
+                            <h4 class="h6 mb-3">Mes rendus pour cette étape</h4>
+                            
+                            {% set userRendus = [] %}
+                            {% for rendu in etape.renduses %}
+                                {% if rendu.user == app.user %}
+                                    {% set userRendus = userRendus|merge([rendu]) %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if userRendus|length > 0 %}
+                                <div class="list-group mb-3">
+                                    {% for rendu in userRendus %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p class="mb-1"><strong>Rendu du {{ rendu.dateHeure|date('d/m/Y à H:i') }}</strong></p>
+                                                <span class="badge bg-secondary">{{ rendu.urlDocument|split('.')|last }}</span>
+                                                {% if rendu.messages|length > 0 %}
+                                                    <div class="mt-2">
+                                                        <span class="text-muted">Messages associés :</span>
+                                                        <div class="mt-1">
+                                                            {% for message in rendu.messages %}
+                                                                <a href="{{ path('app_message_show', {'id': message.id}) }}" class="badge bg-info text-decoration-none me-1">
+                                                                    <i class="fas fa-envelope me-1"></i> {{ message.titre|length > 20 ? message.titre|slice(0, 20) ~ '...' : message.titre }}
+                                                                </a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="btn-group">
+                                                <a href="{{ path('app_rendus_download', {'id': rendu.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download me-1"></i> Télécharger
+                                                </a>
+                                                <form method="post" action="{{ path('app_rendus_delete', {'id': rendu.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce rendu ?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash me-1"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Vous n'avez pas encore soumis de rendu pour cette étape.</p>
+                            {% endif %}
+                            
+                            <!-- Formulaire d'ajout de rendu -->
+                            <div class="card mt-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Soumettre un nouveau rendu</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="{{ path('app_rendus_add') }}" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <label for="document_{{ etape.id }}" class="form-label">Document à rendre</label>
+                                            <input type="file" id="document_{{ etape.id }}" name="document" class="form-control" required>
+                                            <div class="form-text">Formats acceptés : PDF, Word, Excel, images, ZIP (max 10 Mo)</div>
+                                        </div>
+                                        <input type="hidden" name="etapeId" value="{{ etape.id }}">
+                                        <input type="hidden" name="parcoursId" value="{{ parcours.id }}">
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-upload me-1"></i> Soumettre mon rendu
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>Aucune étape n'a encore été définie pour ce parcours.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+    }
+    
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 20px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        z-index: 1;
+    }
+</style>
+{% endblock %}

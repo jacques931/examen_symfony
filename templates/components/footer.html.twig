@@ -1,0 +1,49 @@
+<footer class="footer mt-5 py-4 bg-dark text-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">À propos de la plateforme</h5>
+                <p>Notre plateforme de parcours pédagogiques vous accompagne dans votre apprentissage avec des contenus personnalisés et un suivi adapté à vos besoins.</p>
+                <div class="social-links">
+                    <a href="#" class="text-light me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-light me-3"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-light me-3"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Liens rapides</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{{ path('app_home') }}" class="text-light text-decoration-none">Accueil</a></li>
+                    {% if app.user %}
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Mon parcours</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Mes rendus</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Ressources</a></li>
+                    {% else %}
+                        <li class="mb-2"><a href="{{ path('app_login') }}" class="text-light text-decoration-none">Connexion</a></li>
+                        <li class="mb-2"><a href="{{ path('app_register') }}" class="text-light text-decoration-none">Inscription</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Informations</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Conditions générales</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Politique de confidentialité</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Mentions légales</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">FAQ</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="border-light">
+        
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="mb-0">&copy; {{ "now"|date("Y") }} Plateforme de Parcours Pédagogiques - Tous droits réservés</p>
+            </div>
+        </div>
+    </div>
+</footer>

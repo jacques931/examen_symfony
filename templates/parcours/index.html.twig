@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes parcours{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Mes parcours</h1>
+            <p class="text-muted">Retrouvez ici tous les parcours qui vous sont assignés.</p>
+        </div>
+    </div>
+    
+    {% if parcours|length > 0 %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for parcour in parcours %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ parcour.objet }}</h5>
+                    <div class="card-text">{{ parcour.description|raw|striptags|slice(0, 150) }}{% if parcour.description|striptags|length > 150 %}...{% endif %}</div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="{{ path('app_parcours_show', {'id': parcour.id}) }}" class="btn btn-primary">Voir le détail</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>Vous n'avez pas encore de parcours assignés.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
