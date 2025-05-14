@@ -54,13 +54,51 @@ class RessourceCrudController extends AbstractCrudController
                     'Autre' => 'autre'
                 ])
                 ->setHelp('Nature de la ressource'),
-            ImageField::new('url_document')
+            TextField::new('url_document')
                 ->setLabel('Document')
-                ->setBasePath('uploads/ressources')
-                ->setUploadDir('public/uploads/ressources')
-                ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setFormTypeOption('required', $pageName === Crud::PAGE_NEW)
-                ->setHelp('Téléchargez le document (PDF, image, etc.)'),
+                ->setFormType(\Symfony\Component\Form\Extension\Core\Type\FileType::class)
+                ->setFormTypeOptions([
+                    'mapped' => false,
+                    'required' => $pageName === Crud::PAGE_NEW,
+                    'constraints' => [
+                        new \Symfony\Component\Validator\Constraints\File([
+                            'maxSize' => '10M',
+                            'mimeTypes' => [
+                                'application/pdf',
+                                'image/jpeg',
+                                'image/png',
+                                'image/gif',
+                                'text/html',
+                                'video/mp4'
+                            ],
+                            'mimeTypesMessage' => 'Veuillez télécharger un document valide (PDF, image, HTML, vidéo)',
+                        ])
+                    ],
+                    'attr' => ['accept' => '.pdf,.jpg,.jpeg,.png,.gif,.html,.mp4']
+                ])
+                ->setHelp('Téléchargez le document (PDF, image, etc.)')
+                ->setCustomOption('uploadDir', 'public/uploads/ressources')
+                ->setCustomOption('uploadPath', 'uploads/ressources')
+                ->onlyOnForms(),
+            TextField::new('url_document')
+                ->setLabel('Document')
+                ->formatValue(function ($value, $entity) {
+                    if (!$value) {
+                        return '';
+                    }
+                    $basePath = '/uploads/ressources';
+                    $mimeType = pathinfo($value, PATHINFO_EXTENSION);
+                    if (in_array($mimeType, ['pdf'])) {
+                        return sprintf('<a href="%s" target="_blank">Voir le PDF</a>', $basePath.'/'.$value);
+                    } elseif (in_array($mimeType, ['jpg', 'jpeg', 'png', 'gif'])) {
+                        return sprintf('<img src="%s" width="100" />', $basePath.'/'.$value);
+                    } elseif (in_array($mimeType, ['mp4'])) {
+                        return sprintf('<video width="320" height="240" controls><source src="%s" type="video/mp4"></video>', $basePath.'/'.$value);
+                    } else {
+                        return sprintf('<a href="%s" target="_blank">Voir le document</a>', $basePath.'/'.$value);
+                    }
+                })
+                ->onlyOnIndex(),
             AssociationField::new('etapes')
                 ->setLabel('Étape associée')
                 ->setRequired(true)
@@ -97,5 +135,33 @@ class RessourceCrudController extends AbstractCrudController
             ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
                 return $action->setLabel('Supprimer');
             });
+    }
+    
+    public function createEntity(string $entityFqcn)
+    {
+        $ressource = new Ressource();
+        return $ressource;
+    }
+    
+    public function updateEntity(\Doctrine\ORM\EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->processUpload($entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
+    }
+    
+    public function persistEntity(\Doctrine\ORM\EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->processUpload($entityInstance);
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+    
+    private function processUpload($ressource): void
+    {
+        $uploadedFile = $this->getContext()->getRequest()->files->get('Ressource')['url_document'] ?? null;
+        
+        if ($uploadedFile) {
+            $newFilename = $this->fileUploader->upload($uploadedFile);
+            $ressource->setUrlDocument($newFilename);
+        }
     }
 }

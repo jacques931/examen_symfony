@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250514122209 extends AbstractMigration
+final class Version20250514143946 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -24,7 +24,7 @@ final class Version20250514122209 extends AbstractMigration
             CREATE TABLE etapes (id INT AUTO_INCREMENT NOT NULL, parcours_id INT DEFAULT NULL, descriptif VARCHAR(255) NOT NULL, consignes VARCHAR(255) NOT NULL, position INT NOT NULL, INDEX IDX_E3443E176E38C0DB (parcours_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE message (id INT AUTO_INCREMENT NOT NULL, titre VARCHAR(255) NOT NULL, contenu LONGTEXT NOT NULL, dateheure DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE message (id INT AUTO_INCREMENT NOT NULL, emetteur_id INT DEFAULT NULL, destinataire_id INT DEFAULT NULL, titre VARCHAR(255) NOT NULL, contenu LONGTEXT NOT NULL, dateheure DATETIME NOT NULL, INDEX IDX_B6BD307F79E92E8C (emetteur_id), INDEX IDX_B6BD307FA4F84F6E (destinataire_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE parcours (id INT AUTO_INCREMENT NOT NULL, objet VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -49,6 +49,12 @@ final class Version20250514122209 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE etapes ADD CONSTRAINT FK_E3443E176E38C0DB FOREIGN KEY (parcours_id) REFERENCES parcours (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE message ADD CONSTRAINT FK_B6BD307F79E92E8C FOREIGN KEY (emetteur_id) REFERENCES `user` (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE message ADD CONSTRAINT FK_B6BD307FA4F84F6E FOREIGN KEY (destinataire_id) REFERENCES `user` (id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE rendus ADD CONSTRAINT FK_A999BBADA76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)
@@ -81,6 +87,12 @@ final class Version20250514122209 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
             ALTER TABLE etapes DROP FOREIGN KEY FK_E3443E176E38C0DB
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE message DROP FOREIGN KEY FK_B6BD307F79E92E8C
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE message DROP FOREIGN KEY FK_B6BD307FA4F84F6E
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE rendus DROP FOREIGN KEY FK_A999BBADA76ED395
