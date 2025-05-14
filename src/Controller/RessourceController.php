@@ -59,8 +59,14 @@ class RessourceController extends AbstractController
      */
     private function slugify(string $text): string
     {
-        // Remplacer les caractères accentués et spéciaux
-        $text = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $text);
+        // Convertir les caractères accentués en ASCII
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        
+        // Convertir en minuscules
+        $text = strtolower($text);
+        
+        // Supprimer tous les caractères qui ne sont pas des lettres, chiffres, tirets ou underscores
+        $text = preg_replace('/[^a-z0-9\-_]/', '', $text);
         
         // Remplacer les espaces par des tirets
         $text = str_replace(' ', '-', $text);
